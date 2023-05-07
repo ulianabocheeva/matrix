@@ -31,7 +31,7 @@ public:
     Matrix( Matrix<T>& matr);
     Matrix(Matrix<T>&& matr);
     explicit Matrix(std::initializer_list<std::initializer_list<T>> lst);
-    ~Matrix(); //деконструктор класса (удаление)
+    ~Matrix();
     Matrix<T>& operator =( Matrix<T>& matr);
     Matrix<T>& operator +=( Matrix<T>& matr);
     Matrix<T>& operator -=( Matrix<T>& matr);
@@ -67,8 +67,8 @@ public:
     template<typename _T>
     friend std::ostream& operator <<(std::ostream&os, Matrix<_T>& matr);
 
-    Iterator iterator_begin();
-    Iterator iterator_end();
+    Iterator iterator_begin(){return Iterator(*this, 0, 0);};
+    Iterator iterator_end(){return Iterator(*this, get_row(), 0);};
 };
 
 template<typename T>
@@ -90,48 +90,60 @@ Matrix<T>::Matrix(unsigned int height, unsigned int width){ //создаем п�
 
 
 template<typename T>
-Matrix<T>::Matrix( Matrix<T>& matr){ // Конструктор копированиие
-    this->height = matr.get_row();
-    this->width = matr.get_columns();
-    this->matr = new T*[this->height];
-    for (int h = 0; h < this->height; h++){
-        this->matr[h] = new T[this->width];
-        for (int w = 0; w < this->width; w++){
-            this->matr[h][w] = matr.getElem(h, w);
+Matrix<T>::Matrix( Matrix<T>& matr){ // Конструктор копированиия
+    try{
+        this->height = matr.get_row();
+        this->width = matr.get_columns();
+        this->matr = new T*[this->height];
+        for (int h = 0; h < this->height; h++){
+            this->matr[h] = new T[this->width];
+            for (int w = 0; w < this->width; w++){
+                this->matr[h][w] = matr.getElem(h, w);
+            }
         }
+    }catch(bad_alloc) {
+        throw exceptions("bad alloc");
     }
 }
 
 
 template<typename T>
 Matrix<T>::Matrix(Matrix<T>&& matr){ // Конструктор перемещения
-    this->height = matr.get_row();
-    this->width = matr.get_columns();
-    this->matr = new T*[this->height];
-    for (int h = 0; h < this->height; h++){
-        this->matr[h] = new T[this->width];
-        for (int w = 0; w < this->width; w++){
-            this->matr[h][w] = matr.getElem(h, w);
-            T elem = 0;
-            matr.setElem(h, w, elem);
+    try{
+        this->height = matr.get_row();
+        this->width = matr.get_columns();
+        this->matr = new T*[this->height];
+        for (int h = 0; h < this->height; h++){
+            this->matr[h] = new T[this->width];
+            for (int w = 0; w < this->width; w++){
+                this->matr[h][w] = matr.getElem(h, w);
+                T elem = 0;
+                matr.setElem(h, w, elem);
+            }
         }
+    }catch(bad_alloc) {
+        throw exceptions("bad alloc");
     }
 }
 
 template<typename T>
 Matrix<T>::Matrix(std::initializer_list<std::initializer_list<T>> lst){ //lst - список инициализаций (значений, которые будем закидывать в матрицу)
-    this->height = lst.size();
-    this->matr = new T*[this->height];
-    int h = 0, w = 0;
-    for (std::initializer_list<T> mas:lst){ // Проходимся по матрицы (каждый элемент массив)
-        w = 0;
-        this->width = mas.size();
-        this->matr[h]= new T[this->width];
-        for (T elem: mas){ // Проходимся по массиву
-            this->matr[h][w] = elem;
-            w++;
+    try{
+        this->height = lst.size();
+        this->matr = new T*[this->height];
+        int h = 0, w = 0;
+        for (std::initializer_list<T> mas:lst){
+            w = 0;
+            this->width = mas.size();
+            this->matr[h]= new T[this->width];
+            for (T elem: mas){
+                this->matr[h][w] = elem;
+                w++;
+            }
+            h++;
         }
-        h++;
+    }catch(bad_alloc) {
+        throw exceptions("bad alloc");
     }
 }
 
@@ -145,7 +157,9 @@ Matrix<T>::~Matrix(){
 
 
 template<typename T>
-Matrix<T>& Matrix<T>::operator=( Matrix<T>& matr){ // Оператор присваивание для матриц
+Matrix<T>& Matrix<T>::operator=( Matrix<T>& matr){ // Оператор присваивания для матриц
+    if (height != matr.get_row() || width != matr.get_columns())
+        throw exceptions ("different size of matrix");
     for(int h = 0; h < this->height; h++){
         for(int w = 0; w < this->width; w++){
             this->matr[h][w] = matr.getElem(h, w);
