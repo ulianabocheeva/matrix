@@ -84,7 +84,7 @@ Matrix<T>::Matrix(unsigned int height, unsigned int width){ //создаем п�
             }
         }
     }catch(bad_alloc) {
-        throw exceptions("bad alloc");
+        throw exceptions("bad allocation");
     }
 }
 
@@ -102,7 +102,7 @@ Matrix<T>::Matrix( Matrix<T>& matr){ // Конструктор копирова�
             }
         }
     }catch(bad_alloc) {
-        throw exceptions("bad alloc");
+        throw exceptions("bad allocation");
     }
 }
 
@@ -122,7 +122,7 @@ Matrix<T>::Matrix(Matrix<T>&& matr){ // Конструктор перемеще�
             }
         }
     }catch(bad_alloc) {
-        throw exceptions("bad alloc");
+        throw exceptions("bad allocation");
     }
 }
 
@@ -143,7 +143,7 @@ Matrix<T>::Matrix(std::initializer_list<std::initializer_list<T>> lst){ //lst - 
             h++;
         }
     }catch(bad_alloc) {
-        throw exceptions("bad alloc");
+        throw exceptions("bad allocation");
     }
 }
 
@@ -159,7 +159,7 @@ Matrix<T>::~Matrix(){
 template<typename T>
 Matrix<T>& Matrix<T>::operator=( Matrix<T>& matr){ // Оператор присваивания для матриц
     if (height != matr.get_row() || width != matr.get_columns())
-        throw exceptions ("different size of matrix");
+        throw exceptions ("Different size of matrix");
     for(int h = 0; h < this->height; h++){
         for(int w = 0; w < this->width; w++){
             this->matr[h][w] = matr.getElem(h, w);
@@ -171,6 +171,8 @@ Matrix<T>& Matrix<T>::operator=( Matrix<T>& matr){ // Оператор прис�
 
 template<typename T>
 Matrix<T>& Matrix<T>::operator+=( Matrix<T>& matr){ // Оператор += для матриц
+    if (height != matr.get_row() || width != matr.get_columns())
+        throw exceptions ("Different size of matrix");
     for(int h = 0; h < this->height; h++){
         for(int w = 0; w < this->width; w++){
             this->matr[h][w] += matr.getElem(h, w);
@@ -181,6 +183,8 @@ Matrix<T>& Matrix<T>::operator+=( Matrix<T>& matr){ // Оператор += дл�
 
 template<typename T>
 Matrix<T>& Matrix<T>::operator-=( Matrix<T>& matr){ // Оператор -= для матриц
+    if (height != matr.get_row() || width != matr.get_columns())
+        throw exceptions ("Different size of matrix");
     for(int h = 0; h < this->height; h++){
         for(int w = 0; w < this->width; w++){
             this->matr[h][w] -= matr.getElem(h, w);
@@ -192,18 +196,24 @@ Matrix<T>& Matrix<T>::operator-=( Matrix<T>& matr){ // Оператор -= дл�
 
 template<typename T>
 void Matrix<T>::setElem(unsigned int height, unsigned int width, T&elem){
+    if (height < 0 || height >= get_row() || width < 0 || width >= get_columns())
+        throw exceptions ("Incorrect index");
     this->matr[height][width] = elem;
 }
 
 
 template<typename T>
 T& Matrix<T>::getElem(unsigned int height, unsigned int width){
+    if (height < 0 || height >= get_row() || width < 0 || width >= get_columns())
+        throw exceptions ("Incorrect index");
     return this->matr[height][width];
 }
 
 
 template<typename T>
 T& Matrix<T>::operator()(unsigned int height, unsigned int width){
+    if (height < 0 || height >= get_row() || width < 0 || width >= get_columns())
+        throw exceptions ("Incorrect index");
     return getElem(height,width);
 }
 
@@ -233,6 +243,8 @@ unsigned int Matrix<T>::get_row() const{
 
 template<typename _T>
 Matrix<_T> operator+( Matrix<_T>& m1,Matrix<_T>& m2){
+    if ( m1.get_row()!= m2.get_row() || m2.get_columns() != m2.get_columns())
+        throw exceptions ("Different size of matrix");
     Matrix<_T> newMatr(m1);
     newMatr += m2;
     return newMatr;
@@ -241,6 +253,8 @@ Matrix<_T> operator+( Matrix<_T>& m1,Matrix<_T>& m2){
 
 template<typename _T>
 Matrix<_T> operator-( Matrix<_T>& m1,Matrix<_T>& m2){
+    if ( m1.get_row()!= m2.get_row() || m2.get_columns() != m2.get_columns())
+        throw exceptions ("Different size of matrix");
     Matrix<_T> newMatr(m1);
     newMatr -= m2;
     return newMatr;
@@ -249,14 +263,16 @@ Matrix<_T> operator-( Matrix<_T>& m1,Matrix<_T>& m2){
 
 template<typename _T>
 Matrix<_T> operator*( Matrix<_T>& m1,Matrix<_T>& m2){
+    if ( m1.get_columns()!= m2.get_row())
+        throw exceptions ("Unsuitable matrix sizes for multiplication");
     Matrix<_T> newMatr(m2.get_columns(), m1.get_row());
     for(int i =0; i < m1.get_row(); i++){
         for(int j =0; j < m2.get_columns(); j++){
             _T elem = 0;
             for (int k=0; k< m1.get_columns();k++){
-                elem += m1.getElem(k,i)*m2.getElem(j,k);
+                elem += m1.getElem(i,k)*m2.getElem(k,j);
             }
-            newMatr.setElem(j,i, elem);
+            newMatr.setElem(i,j, elem);
         }
     }
     return newMatr;

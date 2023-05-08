@@ -64,6 +64,12 @@ void test_constructor()
     } catch(exceptions &e) {
         cout << "Exception is: " << e.what() << endl;
     }
+    try {
+        Matrix<int> matr4(0,0);
+        cout << MESSAGE << matr4 << endl;
+    } catch(exceptions &e) {
+        cout << "Exception is: " << e.what() << endl;
+    }
 }
 
 void test_init_list()//конструктор со списком инициализации
@@ -71,8 +77,10 @@ void test_init_list()//конструктор со списком инициал
     try {
         Matrix<int> matr_init{{1,2,3}, {4,5,6}};
         cout << MESSAGE << matr_init << endl;
-        Matrix<int> matr_init1{};
+        Matrix<int> matr_init1{{1,2}, {3,4}};
         cout << MESSAGE << matr_init1 << endl;
+        Matrix<int> matr_init2{};
+        cout << MESSAGE << matr_init2 << endl;
     } catch(exceptions &e) {
         cout << "Exception is: " << e.what() << endl;
     }
@@ -117,40 +125,117 @@ void test_operator_eq()//перегрузка оператора присваи�
 }
 
 void test_operator_plus_and_equall(){
-    /*try {
-        Matrix<int> matrCopy{{1,2,3}, {4,5,6}};
-        Matrix<int> matrCopy2(2,3);
-        matrCopy2 = matrCopy;
-        cout << MESSAGE << matrCopy2 << endl;
+    try {
+        Matrix<int> matr{{1,2,3}, {4,5,6}};
+        Matrix<int> matr2(2,3);
+        matr2 = matr;
+        cout << MESSAGE << matr2 << endl;
+        Matrix<int> matr3(2,2);
+        matr3 = matr;
+        cout << MESSAGE << matr3 << endl;
     } catch(exceptions &e) {
         cout << "Exception is: " << e.what() << endl;
-    }*/
+    }
 }
 
 void test_operator_minus_and_equall(){
-    /*try {
-        Matrix<int> matrCopy{{1,2,3}, {4,5,6}};
-        Matrix<int> matrCopy2(2,3);
-        matrCopy2 = matrCopy;
-        cout << MESSAGE << matrCopy2 << endl;
+    try {
+        Matrix<int> matr{{1,2,3}, {4,5,6}};
+        Matrix<int> matr2(2,3);
+        matr2 = matr;
+        cout << MESSAGE << matr2 << endl;
+        Matrix<int> matr3(2,2);
+        matr3 = matr;
+        cout << MESSAGE << matr3 << endl;
     } catch(exceptions &e) {
         cout << "Exception is: " << e.what() << endl;
-    }*/
+    }
 }
 
 void test_plus(){
-    /*try {
-        Matrix<int> matrCopy{{1,2,3}, {4,5,6}};
-        Matrix<int> matrCopy2(2,3);
-        matrCopy2 = matrCopy;
-        cout << MESSAGE << matrCopy2 << endl;
+    Matrix <int> initMatr({{1, 2, 3}, {4, 5, 6}});
+    Matrix <int> initMatr2 ({{1, 2, 3}, {4, 5, 6}});
+    Matrix <int> matr (1,1);
+    Matrix <int> emptyMatr(0,0);
+    try {
+        Matrix <int> resMatr = initMatr+initMatr2;
+        cout << MESSAGE << resMatr << endl;
+        Matrix <int> resMatr2 = initMatr+matr;
+        cout << MESSAGE << resMatr2 << endl;
     } catch(exceptions &e) {
         cout << "Exception is: " << e.what() << endl;
-    }*/
+    }
+    try {
+        Matrix <int> resMatr3 = matr+emptyMatr;
+        cout << MESSAGE << resMatr3 << endl;
+    } catch(exceptions &e) {
+        cout << "Exception is: " << e.what() << endl;
+    }
+    try {
+        Matrix <int> resMatr4 = emptyMatr+emptyMatr;
+        cout << MESSAGE << resMatr4 << endl;
+    } catch(exceptions &e) {
+        cout << "Exception is: " << e.what() << endl;
+    }
 }
 
-void test_minus(){}
-void test_multiple(){}
+void test_minus(){
+    Matrix <int> initMatr({{1, 2, 3}, {4, 5, 6}});
+    Matrix <int> initMatr2 ({{0, 1, 2}, {3, 4, 5}});
+    Matrix <int> matr (1,1);
+    Matrix <int> emptyMatr(0,0);
+    try {
+        Matrix <int> resMatr = initMatr-initMatr2;
+        cout << MESSAGE << resMatr << endl;
+        Matrix <int> resMatr2 = initMatr-matr;
+        cout << MESSAGE << resMatr2 << endl;
+    } catch(exceptions &e) {
+        cout << "Exception is: " << e.what() << endl;
+    }
+    try {
+        Matrix <int> resMatr3 = matr-emptyMatr;
+        cout << MESSAGE << resMatr3 << endl;
+    } catch(exceptions &e) {
+        cout << "Exception is: " << e.what() << endl;
+    }
+    try {
+        Matrix <int> resMatr4 = emptyMatr-emptyMatr;
+        cout << MESSAGE << resMatr4 << endl;
+    } catch(exceptions &e) {
+        cout << "Exception is: " << e.what() << endl;
+    }
+}
+
+void test_multiple(){
+    Matrix <int> initMatr({{1, 2}, {3, 4}});
+    Matrix <int> initMatr2 ({{1, 2}, {3, 4}});
+    Matrix <int> initMatr3 ({{1, 2, 3},{4,5,6}});
+    Matrix <int> initMatr4 ({{1, 2},{3,4},{5,6}});
+    Matrix <int> matr (1,1);
+    Matrix <int> emptyMatr(0,0);
+    try {
+        Matrix <int> resMatr = initMatr*initMatr2;
+        cout << MESSAGE << resMatr << endl;
+        Matrix <int> resMatr2 = initMatr3*initMatr4;
+        cout << MESSAGE << resMatr2 << endl;
+        Matrix <int> resMatr3 = initMatr*initMatr4;
+        cout << MESSAGE << resMatr3 << endl;
+    } catch(exceptions &e) {
+        cout << "Exception is: " << e.what() << endl;
+    }
+    try {
+        Matrix <int> resMatr3 = matr*emptyMatr;
+        cout << MESSAGE << resMatr3 << endl;
+    } catch(exceptions &e) {
+        cout << "Exception is: " << e.what() << endl;
+    }
+    try {
+        Matrix <int> resMatr4 = emptyMatr*emptyMatr;
+        cout << MESSAGE << resMatr4 << endl;
+    } catch(exceptions &e) {
+        cout << "Exception is: " << e.what() << endl;
+    }
+}
 void test_plus_matr_and_num(){}
 void test_minus_matr_and_num(){}
 void test_multiple_matr_and_num(){}
