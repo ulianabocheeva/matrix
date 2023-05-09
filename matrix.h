@@ -307,6 +307,8 @@ Matrix<_T> operator-( Matrix<_T>& m1,double num){
 
 template<typename _T>
 Matrix<_T> operator/( Matrix<_T>& m1,double num){
+    if ( num==0)
+        throw exceptions ("It is forbidden to divide by 0");
     Matrix<_T> newMatr(m1);
     for(int h = 0; h < m1.get_row(); h++){
         for(int w =0; w < m1.get_columns(); w++){
