@@ -2,7 +2,7 @@
 #define EXCEPTIONS_H
 #include <iostream>
 
-class exceptions: public std::exception // public, как наследуется - protected & public идет для всех
+class exceptions: public std::exception
 {
 private:
     char *message;

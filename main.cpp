@@ -22,7 +22,11 @@ void test_get_elem();//получение элемента
 void test_square();//проверка на квадратность
 void test_get_rows_cols();//тест на размер
 void test_set_elem();//добавление элемента
-void test_iterator();
+void test_iterator_begin_end();
+void iterator_next_test();
+void iterator_increment_test();
+void iterator_value_test();
+void iterator_operators_test();
 
 int main(){
     test_constructor();
@@ -43,7 +47,11 @@ int main(){
     test_square();
     test_get_rows_cols();
     test_set_elem();
-    test_iterator();
+    test_iterator_begin_end();
+    iterator_next_test();
+    iterator_increment_test();
+    iterator_value_test();
+    iterator_operators_test();
 }
 
 void test_constructor()
@@ -125,8 +133,17 @@ void test_operator_eq()//перегрузка оператора присваи�
         equal_matrix2 = init_matrix2;
         cout <<  equal_matrix2 << endl;
         Matrix <int> matr (1,1);
-        equal_matrix = matr;
-        cout <<  equal_matrix << endl;
+        Matrix <int> equal_matrix6 = matr;
+        cout <<  equal_matrix6 << endl;
+        Matrix <int> init_matrix3(init_matrix);
+        Matrix <int> equal_matrix3=init_matrix3;
+        cout <<  equal_matrix3 << endl;
+        Matrix <int> init_matrix4=std::move(init_matrix);
+        cout <<  init_matrix4 << endl;
+        Matrix <int> init_matrix5(0,0);
+        Matrix <int> equal_matrix5=init_matrix5;
+        cout <<  equal_matrix5 << endl;
+
     } catch(exceptions &e) {
         cout << "Exception is: " << e.what() << endl;
     }
@@ -394,22 +411,119 @@ void test_set_elem(){
     }
 }
 
-void test_iterator(){
+void test_iterator_begin_end(){
     cout<<MESSAGE<<endl;
     try {
-        Matrix <int> matr{{1,2,3},{4,5,6},{7,8,9}};
-        Matrix <int>::Iterator it = matr.iterator_begin();
-        cout << MESSAGE << it.value() << endl;
-        cout << MESSAGE << *it << endl;
-        cout << MESSAGE << (++it).value() << endl;
-        Matrix <int> matr2{{1,2,3},{4,5,6},{7,8,9}};
-        Matrix <int>::Iterator it2 = matr2.iterator_end();
-        cout << MESSAGE << it2.value() << endl;
-        cout << MESSAGE << (it == it2) << endl;
-        cout << MESSAGE << (it != it2) << endl;
-        Matrix <int> matr3{};
-        Matrix<int> move = std::move(matr);
+        Matrix <int> matr{{11,2,3},{4,5,6},{7,8,9}};
+        Matrix <int>::Iterator it_begin = matr.iterator_begin();
+        if (it_begin.is_begin())
+            cout<<"Iterator begin test passed"<<endl;
+        else
+            cout<<"Iterator begin test wasn't passed"<<endl;
+        Matrix <int>::Iterator it_end=matr.iterator_end();
+        if (it_end.is_end())
+            cout<<"Iterator end test passed"<<endl;
+        else
+            cout<<"Iterator end test wasn't passed"<<endl;
         } catch(exceptions &e) {
-            cout << "Exception says: " << e.what() << endl;
+            cout << "Exception is: " << e.what() << endl;
+        }
+}
+
+void iterator_next_test(){
+    cout<<MESSAGE<<endl;
+    try {
+        Matrix <int> matr{{11,2,3},{4,5,6},{7,8,9}};
+        Matrix <int>::Iterator it_begin = matr.iterator_begin();
+        bool flag = true;
+        for (size_t i = 0; i<matr.get_row(); i++){
+            for (size_t j = 0; j<matr.get_columns(); j++){
+                if (matr(i,j) != *it_begin){
+                    flag = false;
+                    break;
+                }
+                it_begin.next();
+            }
+        }
+        flag ? cout << "Iterator next test passed" << endl : cout << "Iterator next test wasn't passed" << endl;
+        } catch(exceptions &e) {
+            cout << "Exception is: " << e.what() << endl;
+        }
+}
+
+void iterator_increment_test(){
+    cout<<MESSAGE<<endl;
+    try {
+        Matrix <int> matr{{11,2,3},{4,5,6},{7,8,9}};
+        Matrix <int>::Iterator it_begin = matr.iterator_begin();
+        bool flag = true;
+        for (size_t i = 0; i<matr.get_row(); i++){
+            for (size_t j = 0; j<matr.get_columns(); j++){
+                if (matr(i,j) != *it_begin){
+                    flag = false;
+                    break;
+                }
+                ++it_begin;
+            }
+        }
+        flag ? cout << "Iterator increment test passed" << endl : cout << "Iterator increment test wasn't passed" << endl;
+        } catch(exceptions &e) {
+            cout << "Exception is: " << e.what() << endl;
+        }
+}
+void iterator_value_test(){
+    cout<<MESSAGE<<endl;
+    try {
+        Matrix <int> matr{{11,2,3},{4,5,6},{7,8,9}};
+        Matrix <int>::Iterator it = matr.iterator_begin();
+        cout << "iterator operators == and !=:" << endl;
+        bool flag = true;
+        while (!it.is_end()) {
+            if (*it != it.value()) {
+                flag = false;
+                break;
+            } else
+                cout << it.value() << " ";
+            ++it;
+        }
+        flag ? cout << "Iteartor value test passed" << endl : cout << "Iterator value test wasn't passed" << endl;
+
+        cout << endl;
+        cout << "iterator operator *:" << endl;
+        Matrix <int>::Iterator it_1 = matr.iterator_begin();
+        flag = true;
+        while (!it_1.is_end()) {
+            if (*it_1 != it_1.value()) {
+                flag = false;
+                break;
+            } else
+                cout << *it_1 << " ";
+            ++it_1;
+        }
+        flag ? cout << "Iterator value test passed" << endl : cout << "Iterator value test was not passed" << endl;
+        } catch(exceptions &e) {
+            cout << "Exception is: " << e.what() << endl;
+        }
+}
+
+void iterator_operators_test(){
+    cout<<MESSAGE<<endl;
+    try {
+        Matrix <int> matr{{11,2,3},{4,5,6},{7,8,9}};
+        Matrix <int>::Iterator it_1 = matr.iterator_begin();
+        Matrix <int>::Iterator it_2 = matr.iterator_begin();
+        bool flag = true;
+        for (; !it_1.is_end() && !it_2.is_end();) {
+            if (*it_1 == *it_2) {
+            } else if (*it_1 != *it_2){
+                flag = false;
+                break;
+            }
+            ++it_1;
+            ++it_2;
+        }
+        flag ? cout << "Iterator operators test passed" << endl : cout << "Iterator operators test was not passed" << endl;
+        } catch(exceptions &e) {
+            cout << "Exception is: " << e.what() << endl;
         }
 }

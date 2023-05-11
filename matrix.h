@@ -15,13 +15,14 @@ public:
     class Iterator
         {
         private:
-            Matrix<T>& it_matrix;
+            Matrix<T>& matr;
             int it_matrix_row;
             int it_matrix_col;
         public:
-            Iterator(Matrix<T> container_obj);
+            Iterator(Matrix <T> &container_obj, size_t rows, size_t cols);
             Iterator next();
             T value();
+            bool is_begin();
             bool is_end();
             Iterator &operator++();
             T &operator*();
@@ -71,6 +72,83 @@ public:
     Iterator iterator_begin();
     Iterator iterator_end();
 };
+
+template <typename Type>
+bool Matrix<Type>::Iterator::operator!=(Iterator &b)
+{
+    return ((it_matrix_row != b.it_matrix_row) || (it_matrix_col != b.it_matrix_col));
+}
+
+template <typename Type>
+bool Matrix<Type>::Iterator::operator==(Iterator &b)
+{
+    return ((it_matrix_row == b.it_matrix_row) && (it_matrix_col == b.it_matrix_col));
+}
+
+template <typename Type>
+Type &Matrix<Type>::Iterator::operator*()
+{
+    return matr(it_matrix_row,it_matrix_col);
+}
+
+template <typename Type>
+typename Matrix<Type>::Iterator &Matrix<Type>::Iterator::operator++()
+{
+    if (!(this->is_end())){
+        if (it_matrix_col == matr.get_columns()-1) {
+            it_matrix_row++;
+            it_matrix_col = 0;
+        } else
+            it_matrix_col++;
+    }
+    return *this;
+}
+
+template <typename Type>
+typename Matrix<Type>::Iterator Matrix<Type>::Iterator::next()
+{
+    if (!(this->is_end())){
+        if ((it_matrix_col == matr.get_columns()-1)) {
+            it_matrix_row++;
+            it_matrix_col = 0;
+        } else
+            it_matrix_col++;
+    }
+    return *this;
+}
+
+template <typename Type>
+Type Matrix<Type>::Iterator::value()
+{
+    return **this;
+}
+
+template <typename Type>
+Matrix<Type>::Iterator::Iterator(Matrix <Type> &container_obj, size_t rows, size_t cols):matr(container_obj), it_matrix_row(rows), it_matrix_col(cols)
+{
+    if (rows == -1 || cols == -1) {
+        it_matrix_row = matr.get_row();
+        it_matrix_col = matr.get_columns();
+    }
+}
+
+template <typename Type>
+bool Matrix<Type>::Iterator::is_end()
+{
+    bool result = false;
+    if (it_matrix_row == matr.get_row() && it_matrix_col == 0)
+        result = true;
+    return result;
+}
+
+template <typename Type>
+bool Matrix<Type>::Iterator::is_begin()
+{
+    bool result = false;
+    if (it_matrix_row == 0 && it_matrix_col == 0)
+        result = true;
+    return result;
+}
 
 template<typename T>
 Matrix<T>::Matrix(unsigned int height, unsigned int width){ //создаем пустую матрицу по размерам
@@ -354,8 +432,7 @@ typename Matrix<Type>::Iterator Matrix<Type>::iterator_begin()
 template<typename Type>
 typename Matrix<Type>::Iterator Matrix<Type>::iterator_end()
 {
-    Iterator iter(*this, get_row(), get_columns());
-    return iter;
+    return Matrix<Type>::Iterator(*this, get_row(), 0);
 }
 
 #endif // MATRIX_H
