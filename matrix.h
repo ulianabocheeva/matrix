@@ -15,8 +15,9 @@ public:
     class Iterator
         {
         private:
-            Matrix<T> it_matrix;
-            int it_matrix_index = -1;
+            Matrix<T>& it_matrix;
+            int it_matrix_row;
+            int it_matrix_col;
         public:
             Iterator(Matrix<T> container_obj);
             Iterator next();
@@ -67,8 +68,8 @@ public:
     template<typename _T>
     friend std::ostream& operator <<(std::ostream&os, Matrix<_T>& matr);
 
-    Iterator iterator_begin(){return Iterator(*this, 0, 0);};
-    Iterator iterator_end(){return Iterator(*this, get_row(), 0);};
+    Iterator iterator_begin();
+    Iterator iterator_end();
 };
 
 template<typename T>
@@ -253,7 +254,7 @@ Matrix<_T> operator+( Matrix<_T>& m1,Matrix<_T>& m2){
 
 template<typename _T>
 Matrix<_T> operator-( Matrix<_T>& m1,Matrix<_T>& m2){
-    if ( m1.get_row()!= m2.get_row() || m2.get_columns() != m2.get_columns())
+    if ( m1.get_row()!= m2.get_row() || m1.get_columns() != m2.get_columns())
         throw exceptions ("Different size of matrix");
     Matrix<_T> newMatr(m1);
     newMatr -= m2;
@@ -344,6 +345,18 @@ std::ostream& operator<<(std::ostream&os, Matrix<_T>& matr){ //добавляе�
     return os;
 }
 
+template<typename Type>
+typename Matrix<Type>::Iterator Matrix<Type>::iterator_begin()
+{
+    return Matrix<Type>::Iterator(*this, 0, 0);
+}
+
+template<typename Type>
+typename Matrix<Type>::Iterator Matrix<Type>::iterator_end()
+{
+    Iterator iter(*this, get_row(), get_columns());
+    return iter;
+}
 
 #endif // MATRIX_H
 
