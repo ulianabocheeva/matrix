@@ -22,6 +22,7 @@ void test_get_elem();//получение элемента
 void test_square();//проверка на квадратность
 void test_get_rows_cols();//тест на размер
 void test_set_elem();//добавление элемента
+void test_bracket();
 void test_iterator_begin_end();
 void iterator_next_test();
 void iterator_increment_test();
@@ -47,6 +48,7 @@ int main(){
     test_square();
     test_get_rows_cols();
     test_set_elem();
+    test_bracket();
     test_iterator_begin_end();
     iterator_next_test();
     iterator_increment_test();
@@ -85,6 +87,8 @@ void test_init_list()//конструктор со списком инициал
         cout <<  matr_init1 << endl;
         Matrix<int> matr_init2{};
         cout <<  matr_init2 << endl;
+        Matrix<int> matr_init3{{2,3},{4}};
+        cout <<  matr_init3 << endl;
     } catch(exceptions &e) {
         cout << "Exception is: " << e.what() << endl;
     }
@@ -99,6 +103,10 @@ void test_copy()//копирование
         Matrix<int> matr3{{1,2,3},{4,5,6}};
         Matrix<int> matr4=matr3;
         cout<<matr4<<endl;
+        matr2=matr4;
+        cout<<matr2<<endl;
+        matr2=matr1;
+        cout<<matr2<<endl;
     } catch(exceptions &e) {
         cout << "Exception is: " << e.what() << endl;
     }
@@ -151,14 +159,25 @@ void test_operator_eq()//перегрузка оператора присваи�
 
 void test_operator_plus_and_equall(){
     cout<<MESSAGE<<endl;
+    Matrix<int> matr{{1,2,3}, {4,5,6}};
     try {
-        Matrix<int> matr{{1,2,3}, {4,5,6}};
-        Matrix<int> matr2(2,3);
-        matr2 = matr;
-        cout  << matr2 << endl;
-        Matrix<int> matr3(2,2);
-        matr3 = matr;
-        cout << matr3 << endl;
+        Matrix<int> matr2{{2,2,2}, {2,2,2}};
+        Matrix<int> matr3(matr);
+        matr += matr2;
+        cout  << matr << endl;
+        Matrix<int> matr5(2,2);
+        matr5 += matr3;
+        cout << matr5 << endl;
+    } catch(exceptions &e) {
+        cout << "Exception is: " << e.what() << endl;
+    }
+    try {
+        Matrix<int> matr4(0,0);
+        Matrix<int> matr5(0,0);
+        matr4 += matr5;
+        cout  << matr4<<"works" << endl;
+        matr4 += matr;
+        cout << matr4 << endl;
     } catch(exceptions &e) {
         cout << "Exception is: " << e.what() << endl;
     }
@@ -166,14 +185,25 @@ void test_operator_plus_and_equall(){
 
 void test_operator_minus_and_equall(){
     cout<<MESSAGE<<endl;
+    Matrix<int> matr{{1,2,3}, {4,5,6}};
     try {
-        Matrix<int> matr{{1,2,3}, {4,5,6}};
-        Matrix<int> matr2(2,3);
-        matr2 = matr;
-        cout  << matr2 << endl;
-        Matrix<int> matr3(2,2);
-        matr3 = matr;
-        cout << matr3 << endl;
+        Matrix<int> matr2{{2,2,2}, {2,2,2}};
+        Matrix<int> matr3(matr);
+        matr -= matr2;
+        cout  << matr << endl;
+        Matrix<int> matr5(2,2);
+        matr5 -= matr3;
+        cout << matr5 << endl;
+    } catch(exceptions &e) {
+        cout << "Exception is: " << e.what() << endl;
+    }
+    try {
+        Matrix<int> matr4(0,0);
+        Matrix<int> matr5(0,0);
+        matr4 -= matr5;
+        cout  << matr4<<"works" << endl;
+        matr4 -= matr;
+        cout << matr4 << endl;
     } catch(exceptions &e) {
         cout << "Exception is: " << e.what() << endl;
     }
@@ -343,8 +373,10 @@ void test_get_elem(){
     cout<<MESSAGE<<endl;
     try {
         Matrix <int> initMatr ({{1, 2, 3}, {4, 5, 6}});
+        initMatr.getElem(1,1)=17;
         cout <<initMatr<< "Matrix 1 1 elem:" <<initMatr.getElem(1,1)<< endl;
         cout <<initMatr<< "Matrix 4 4 elem:" <<initMatr.getElem(4,4)<< endl;
+
     } catch(exceptions &e) {
         cout << "Exception is: " << e.what() << endl;
     }
@@ -409,6 +441,23 @@ void test_set_elem(){
     } catch(exceptions &e) {
         cout << "Exception is: " << e.what() << endl;
     }
+}
+
+void test_bracket(){
+    cout<<MESSAGE<<endl;
+    try {
+        Matrix <int> matr{{11,2,3},{4,5,6},{7,8,9}};
+        cout<<matr(1,2)<<endl;
+        cout<<matr(7,7)<<endl;
+        } catch(exceptions &e) {
+            cout << "Exception is: " << e.what() << endl;
+        }
+    try {
+        Matrix <int> matr(0,0);
+        cout<<matr(7,7)<<endl;
+        } catch(exceptions &e) {
+            cout << "Exception is: " << e.what() << endl;
+        }
 }
 
 void test_iterator_begin_end(){
