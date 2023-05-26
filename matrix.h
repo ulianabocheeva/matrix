@@ -73,83 +73,6 @@ public:
     Iterator iterator_end();
 };
 
-template <typename Type>
-bool Matrix<Type>::Iterator::operator!=(Iterator &b)
-{
-    return ((it_matrix_row != b.it_matrix_row) || (it_matrix_col != b.it_matrix_col));
-}
-
-template <typename Type>
-bool Matrix<Type>::Iterator::operator==(Iterator &b)
-{
-    return ((it_matrix_row == b.it_matrix_row) && (it_matrix_col == b.it_matrix_col));
-}
-
-template <typename Type>
-Type &Matrix<Type>::Iterator::operator*()
-{
-    return matr(it_matrix_row,it_matrix_col);
-}
-
-template <typename Type>
-typename Matrix<Type>::Iterator &Matrix<Type>::Iterator::operator++()
-{
-    if (!(this->is_end())){
-        if (it_matrix_col == matr.get_columns()-1) {
-            it_matrix_row++;
-            it_matrix_col = 0;
-        } else
-            it_matrix_col++;
-    }
-    return *this;
-}
-
-template <typename Type>
-typename Matrix<Type>::Iterator Matrix<Type>::Iterator::next()
-{
-    if (!(this->is_end())){
-        if ((it_matrix_col == matr.get_columns()-1)) {
-            it_matrix_row++;
-            it_matrix_col = 0;
-        } else
-            it_matrix_col++;
-    }
-    return *this;
-}
-
-template <typename Type>
-Type Matrix<Type>::Iterator::value()
-{
-    return **this;
-}
-
-template <typename Type>
-Matrix<Type>::Iterator::Iterator(Matrix <Type> &container_obj, size_t rows, size_t cols):matr(container_obj), it_matrix_row(rows), it_matrix_col(cols)
-{
-    if (rows == -1 || cols == -1) {
-        it_matrix_row = matr.get_row();
-        it_matrix_col = matr.get_columns();
-    }
-}
-
-template <typename Type>
-bool Matrix<Type>::Iterator::is_end()
-{
-    bool result = false;
-    if (it_matrix_row == matr.get_row() && it_matrix_col == 0)
-        result = true;
-    return result;
-}
-
-template <typename Type>
-bool Matrix<Type>::Iterator::is_begin()
-{
-    bool result = false;
-    if (it_matrix_row == 0 && it_matrix_col == 0)
-        result = true;
-    return result;
-}
-
 template<typename T>
 Matrix<T>::Matrix(unsigned int height, unsigned int width){ //создаем пустую матрицу по размерам
     try {
@@ -163,6 +86,9 @@ Matrix<T>::Matrix(unsigned int height, unsigned int width){ //создаем п�
             }
         }
     }catch(bad_alloc) {
+        this->height = 0;
+        this->width = 0;
+        this->matr = nullptr;
         throw exceptions("bad allocation");
     }
 }
@@ -181,6 +107,9 @@ Matrix<T>::Matrix( Matrix<T>& matr){ // Конструктор копирова�
             }
         }
     }catch(bad_alloc) {
+        this->height = 0;
+        this->width = 0;
+        this->matr = nullptr;
         throw exceptions("bad allocation");
     }
 }
@@ -201,6 +130,9 @@ Matrix<T>::Matrix(Matrix<T>&& matr){ // Конструктор перемеще�
             }
         }
     }catch(bad_alloc) {
+        this->height = 0;
+        this->width = 0;
+        this->matr = nullptr;
         throw exceptions("bad allocation");
     }
 }
@@ -222,16 +154,21 @@ Matrix<T>::Matrix(std::initializer_list<std::initializer_list<T>> lst){ //lst - 
             h++;
         }
     }catch(bad_alloc) {
+        this->height = 0;
+        this->width = 0;
+        this->matr = nullptr;
         throw exceptions("bad allocation");
     }
 }
 
 template<typename T>
 Matrix<T>::~Matrix(){
-    for (int i =0; i < (this->height); i++){
-        delete this->matr[i];
+    if (matr!=nullptr){
+        for (int i =0; i < (this->height); i++){
+            delete this->matr[i];
+        }
+        delete this->matr;
     }
-    delete this->matr;
 }
 
 
@@ -244,6 +181,9 @@ Matrix<T>& Matrix<T>::operator=( Matrix<T>& matr){ // Оператор прис�
             this->matr[h][w] = matr.getElem(h, w);
         }
     }
+//    Matrix<T>::~Matrix();
+//    Matrix<T> ma(matr);
+//    *this = ma;
     return *this;
 }
 
@@ -275,9 +215,7 @@ Matrix<T>& Matrix<T>::operator-=( Matrix<T>& matr){ // Оператор -= дл�
 
 template<typename T>
 void Matrix<T>::setElem(unsigned int height, unsigned int width, T&elem){
-    if (height < 0 || height >= get_row() || width < 0 || width >= get_columns())
-        throw exceptions ("Incorrect index");
-    this->matr[height][width] = elem;
+    getElem(height,width) = elem;
 }
 
 
@@ -383,10 +321,9 @@ Matrix<_T> operator-( Matrix<_T>& m1,double num){
     return newMatr;
 }
 
-
 template<typename _T>
 Matrix<_T> operator/( Matrix<_T>& m1,double num){
-    if ( num==0)
+    if (num==0)
         throw exceptions ("It is forbidden to divide by 0");
     Matrix<_T> newMatr(m1);
     for(int h = 0; h < m1.get_row(); h++){
@@ -397,7 +334,6 @@ Matrix<_T> operator/( Matrix<_T>& m1,double num){
     }
     return newMatr;
 }
-
 
 template<typename _T>
 Matrix<_T> operator*( Matrix<_T>& m1, double num){
@@ -411,12 +347,11 @@ Matrix<_T> operator*( Matrix<_T>& m1, double num){
     return newMatr;
 }
 
-
 template<typename _T>
-std::ostream& operator<<(std::ostream&os, Matrix<_T>& matr){ //добавляем поток данных для вывода. Вывести в строчку все элементы матрицы
+std::ostream& operator<<(std::ostream&os, Matrix<_T>& matr){
     for(int h = 0; h < matr.get_row(); h++){
         for (int w = 0; w < matr.get_columns(); w++){
-            os<< matr.getElem(h, w) << " "; //os изначальный поток
+            os<< matr.getElem(h, w) << " ";
         }
         os << std::endl;
     }
@@ -434,6 +369,84 @@ typename Matrix<Type>::Iterator Matrix<Type>::iterator_end()
 {
     return Matrix<Type>::Iterator(*this, get_row(), 0);
 }
+
+template <typename Type>
+bool Matrix<Type>::Iterator::operator!=(Iterator &b)
+{
+    return ((it_matrix_row != b.it_matrix_row) || (it_matrix_col != b.it_matrix_col));
+}
+
+template <typename Type>
+bool Matrix<Type>::Iterator::operator==(Iterator &b)
+{
+    return ((it_matrix_row == b.it_matrix_row) && (it_matrix_col == b.it_matrix_col));
+}
+
+template <typename Type>
+Type &Matrix<Type>::Iterator::operator*()
+{
+    return matr(it_matrix_row,it_matrix_col);
+}
+
+template <typename Type>
+typename Matrix<Type>::Iterator &Matrix<Type>::Iterator::operator++()
+{
+    if (!(this->is_end())){
+        if (it_matrix_col == matr.get_columns()-1) {
+            it_matrix_row++;
+            it_matrix_col = 0;
+        } else
+            it_matrix_col++;
+    }
+    return *this;
+}
+
+template <typename Type>
+typename Matrix<Type>::Iterator Matrix<Type>::Iterator::next()
+{
+    if (!(this->is_end())){
+        if ((it_matrix_col == matr.get_columns()-1)) {
+            it_matrix_row++;
+            it_matrix_col = 0;
+        } else
+            it_matrix_col++;
+    }
+    return *this;
+}
+
+template <typename Type>
+Type Matrix<Type>::Iterator::value()
+{
+    return **this;
+}
+
+template <typename Type>
+Matrix<Type>::Iterator::Iterator(Matrix <Type> &container_obj, size_t rows, size_t cols):matr(container_obj), it_matrix_row(rows), it_matrix_col(cols)
+{
+    if (rows == -1 || cols == -1) {
+        it_matrix_row = matr.get_row();
+        it_matrix_col = matr.get_columns();
+    }
+}
+
+template <typename Type>
+bool Matrix<Type>::Iterator::is_end()
+{
+    bool result = false;
+    if (it_matrix_row == matr.get_row() && it_matrix_col == 0)
+        result = true;
+    return result;
+}
+
+template <typename Type>
+bool Matrix<Type>::Iterator::is_begin()
+{
+    bool result = false;
+    if (it_matrix_row == 0 && it_matrix_col == 0)
+        result = true;
+    return result;
+}
+
 
 #endif // MATRIX_H
 
